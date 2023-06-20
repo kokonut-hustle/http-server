@@ -1,11 +1,15 @@
 #pragma once
-#include <string>
 #include <map>
+#include <string>
 
-class Config_t {
-    using Config = std::map<std::string, std::string>;
-public:
-    bool read(const std::string &filename);
-private:
-    Config values;
-};
+namespace Config {
+    template<typename T>
+    using Settings = std::map<std::string, T>;
+
+    struct Configuration {
+        Settings<int> int_settings;
+        Settings<std::string> string_settings;
+    };
+
+    bool load_configuration();
+}
