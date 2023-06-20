@@ -7,64 +7,64 @@ Server::Server() {
 }
 
 Server::~Server() {
-    close(serverSocket);
+    close(server_socket);
 }
 
 bool Server::init() {
-    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (serverSocket == -1) {
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket == -1) {
         std::cerr << "Failed to create socket." << std::endl;
         return false;
     }
 
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-    serverAddress.sin_port = htons(config.int_settings["port"]);
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_address.sin_port = htons(config.int_settings["port"]);
     return true;
 }
 
 bool Server::start() {
-    if (bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
+    if (bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
         std::cerr << "Failed to bind the socket to the specified address." << std::endl;
         return false;
     }
 
-    if (listen(serverSocket, 10) < 0) {
+    if (listen(server_socket, 10) < 0) {
         std::cerr << "Failed to listen on the socket." << std::endl;
         return false;
     }
 
     std::cout << "Server started on port " << config.int_settings["port"] << std::endl;
     while (true) {
-        sockaddr_in clientAddress{};
-        socklen_t clientAddressLength = sizeof(clientAddress);
-        int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &clientAddressLength);
+        sockaddr_in client_address{};
+        socklen_t client_address_length = sizeof(client_address);
+        int client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_address_length);
 
-        if (clientSocket < 0) {
+        if (client_socket < 0) {
             std::cerr << "Failed to accept the client connection." << std::endl;
             continue;
         }
 
         char buffer[MAX_BUFFER_SIZE];
-        ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer) - 1);
+        ssize_t bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
 
-        if (bytesRead < 0) {
+        if (bytes_read < 0) {
             std::cerr << "Failed to read from the client socket." << std::endl;
-            close(clientSocket);
+            close(client_socket);
             continue;
         }
 
-        buffer[bytesRead] = '\0';
+        buffer[bytes_read] = '\0';
         std::string request(buffer);
 
-        std::string response = handleRequest(request);
+        std::string response = handle_request(request);
 
-        ssize_t bytesWritten = write(clientSocket, response.c_str(), response.size());
-        if (bytesWritten < 0) {
+        ssize_t bytes_written = write(client_socket, response.c_str(), response.size());
+        if (bytes_written < 0) {
             std::cerr << "Failed to write to the client socket." << std::endl;
         }
 
-        close(clientSocket);
+        close(client_socket);
     }
 
     return true;

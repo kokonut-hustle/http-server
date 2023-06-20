@@ -1,6 +1,6 @@
 #include "log.hpp"
 
-Logger::Logger() : stopFlag(false), isLogging(false) {}
+Logger::Logger() : stop_flag(false), is_logging(false) {}
 
 Logger::~Logger() {
     stop_logging();
@@ -13,62 +13,62 @@ Logger& Logger::get_instance() {
 
 void Logger::log_to_file(const std::string &message) {
     {
-        std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push(message);
+        std::lock_guard<std::mutex> lock(queue_mutex);
+        log_queue.push(message);
     }
-    conditionVariable.notify_one(); // Notify waiting thread
+    cond_var.notify_one(); // Notify waiting thread
 
     // Start the logging thread if it's not running
-    if (!isLogging) {
+    if (!is_logging) {
         start_logging_thread();
     }
 }
 
 void Logger::stop_logging() {
     // Set the stop flag and notify the logging thread
-    stopFlag = true;
-    conditionVariable.notify_one();
+    stop_flag = true;
+    cond_var.notify_one();
 
     // Wait for the logging thread to finish
-    if (loggingThread.joinable()) {
-        loggingThread.join();
+    if (logging_thread.joinable()) {
+        logging_thread.join();
     }
 }
 
 void Logger::start_logging_thread() {
-    isLogging = true;
-    loggingThread = std::thread([this]() {
+    is_logging = true;
+    logging_thread = std::thread([this]() {
         while (true) {
             std::string message;
             {
-                std::unique_lock<std::mutex> lock(queueMutex);
-                conditionVariable.wait(lock, [this]() {
-                    return !logQueue.empty() || stopFlag;
+                std::unique_lock<std::mutex> lock(queue_mutex);
+                cond_var.wait(lock, [this]() {
+                    return !log_queue.empty() || stop_flag;
                 });
 
-                if (!logQueue.empty()) {
-                    message = logQueue.front();
-                    logQueue.pop();
+                if (!log_queue.empty()) {
+                    message = log_queue.front();
+                    log_queue.pop();
                 }
             }
 
             if (!message.empty()) {
-                writeToFile(message);
+                write_to_file(message);
             }
 
-            if (stopFlag && logQueue.empty()) {
+            if (stop_flag && log_queue.empty()) {
                 break;
             }
         }
-        isLogging = false;
+        is_logging = false;
     });
 }
 
-void Logger::writeToFile(const std::string &message) {
-    std::ofstream logFile("log.txt", std::ios::app);
-    if (logFile.is_open()) {
-        logFile << message << std::endl;
-        logFile.close();
+void Logger::write_to_file(const std::string &message) {
+    std::ofstream log_file("log.txt", std::ios::app);
+    if (log_file.is_open()) {
+        log_file << message << std::endl;
+        log_file.close();
     } else {
         std::cerr << "Failed to open the log file." << std::endl;
     }

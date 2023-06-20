@@ -16,12 +16,12 @@ private:
     Logger();
     ~Logger();
     void start_logging_thread();
-    void writeToFile(const std::string &message);
+    void write_to_file(const std::string &message);
 
-    std::mutex queueMutex;
-    std::queue<std::string> logQueue;
-    std::condition_variable conditionVariable;
-    bool isLogging;
-    bool stopFlag;
-    std::thread loggingThread;
+    std::mutex queue_mutex;
+    std::queue<std::string> log_queue;
+    std::condition_variable cond_var;
+    bool is_logging;
+    bool stop_flag;
+    std::thread logging_thread;
 };
