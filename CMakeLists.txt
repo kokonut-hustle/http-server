@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES(include)
 
 FILE(GLOB SOURCES src/*.cpp)
 
-ADD_EXECUTABLE(http_srv ${SOURCES})
+ADD_EXECUTABLE(http_srv ${SOURCES} main.cpp)
 
 TARGET_COMPILE_OPTIONS(http_srv PRIVATE
     # -Wall                    # Enable all warnings

@@ -6,6 +6,8 @@
 #include <condition_variable>
 #include <thread>
 
+#define Log(x) Logger::get_instance().log_to_file(x)
+
 class Logger {
 public:
     static Logger& get_instance();
