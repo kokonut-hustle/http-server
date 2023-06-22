@@ -1,8 +1,24 @@
 #pragma once
 
 #include <iostream>
+#include <array>
 #include <string>
-#include <map>
+#include <unordered_map>
+
+
+enum RequestMethod {
+    GET,
+    POST,
+    PUT,
+    DELETE
+};
+
+constexpr std::array<const char*, 4> METHOD_STR = {
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE"
+};
 
 class HttpRequest {
 public:
@@ -11,6 +27,8 @@ public:
     void parse() {
         get_request_method();
         get_request_path();
+        set_req_id();
+        get_request_queries();
         get_request_headers();
         get_request_body();
     }
@@ -18,28 +36,31 @@ public:
     void show_request() {
         std::cout << "method " << method << std::endl;
         std::cout << "path " << path << std::endl;
+        for (auto t : queries)
+            std::cout << t.first << " " << t.second << std::endl;
         std::cout << "headers " << std::endl;
         for (auto t : headers)
             std::cout << t.first << " " << t.second << std::endl;
         std::cout << "body " << body << std::endl;
     }
 
-private:
-    enum RequestMethod {
-        GET,
-        POST,
-        PUT,
-        DELETE
-    };
+    const RequestMethod &get_method() const;
+    const std::string &get_path() const;
+    void set_req_id();
+    const std::string &get_req_id() const;
 
+private:
     std::string get_request_method();
     std::string get_request_path();
-    std::map<std::string, std::string> get_request_headers();
+    std::unordered_map<std::string, std::string> get_request_queries();
+    std::unordered_map<std::string, std::string> get_request_headers();
     std::string get_request_body();
 
     const std::string request;
+    std::string req_id;
     RequestMethod method;
     std::string path;
-    std::map<std::string, std::string> headers;
+    std::unordered_map<std::string, std::string> headers;
+    std::unordered_map<std::string, std::string> queries;
     std::string body;
 };

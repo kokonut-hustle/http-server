@@ -1,5 +1,21 @@
 #include "request.hpp"
 
+const std::string &HttpRequest::get_path() const {
+    return path;
+}
+
+const RequestMethod &HttpRequest::get_method() const {
+    return method;
+}
+
+void HttpRequest::set_req_id() {
+    req_id = std::string(METHOD_STR[method]) + " " + path;
+}
+
+const std::string &HttpRequest::get_req_id() const {
+    return req_id;
+}
+
 std::string HttpRequest::get_request_method() {
     std::string method_str;
 
@@ -41,19 +57,62 @@ std::string HttpRequest::get_request_path() {
         throw std::runtime_error("Invalid request format: no path found");
     }
 
-    // Find the end of the path (indicated by the next space character or end of line)
-    size_t path_end = request.find(' ', path_start);
+    // Find the end of the path (indicated by the ampersand or the next space character or end of line)
+    size_t path_end = request.find('&', path_start);
     if (path_end == std::string::npos) {
-        path_end = request.size();
+        path_end = request.find(' ', path_start);
+        if (path_end == std::string::npos) {
+            path_end = request.size();
+        }
     }
 
     // Extract the path substring
-    std::string path = request.substr(path_start, path_end - path_start);
+    path = request.substr(path_start, path_end - path_start);
 
     return path;
 }
 
-std::map<std::string, std::string> HttpRequest::get_request_headers() {
+std::unordered_map<std::string, std::string> HttpRequest::get_request_queries() {
+    // Find the position of the query string in the URL
+    size_t queries_start = path.find('?');
+    if (queries_start != std::string::npos) {
+        // Extract the query string
+        std::string queries_str = path.substr(queries_start + 1);
+
+        // Split the query string into individual key-value pairs
+        size_t pos = 0;
+        while (pos != std::string::npos) {
+            // Find the position of the next '&' character
+            size_t ampersand_pos = queries_str.find('&', pos);
+
+            // Extract the key-value pair
+            std::string key_val_pair;
+            if (ampersand_pos != std::string::npos) {
+                key_val_pair = queries_str.substr(pos, ampersand_pos - pos);
+                pos = ampersand_pos + 1;
+            } else {
+                key_val_pair = queries_str.substr(pos);
+                pos = std::string::npos;
+            }
+
+            // Split the key-value pair into key and value
+            size_t equal_pos = key_val_pair.find('=');
+            if (equal_pos != std::string::npos) {
+                std::string key = key_val_pair.substr(0, equal_pos);
+                std::string value = key_val_pair.substr(equal_pos + 1);
+
+                // URL-decode the key and value if necessary
+
+                // Store the key-value pair in the result map
+                queries[key] = value;
+            }
+        }
+    }
+
+    return queries;
+}
+
+std::unordered_map<std::string, std::string> HttpRequest::get_request_headers() {
     // Find the position of the end of the request line
     size_t request_line_end_pos = request.find("\r\n");
     if (request_line_end_pos == std::string::npos) {

@@ -1,9 +1,11 @@
 #include "server.hpp"
 #include "request.hpp"
 #include "response.hpp"
+#include "error_page_handler.hpp"
 #include "log.hpp"
 
-Server::Server() {
+Server::Server(PathHandlerMap &&_path_handler_map)
+    : path_handler_map(_path_handler_map) {
     config.int_settings = std::move(int_settings);
     config.string_settings = std::move(string_settings);
     Config::load_configuration();
@@ -70,21 +72,30 @@ bool Server::start() {
         HttpRequest serv(request);
         serv.parse();
 
-        HttpResponse resp(200);
-        resp.set_body("Hello World!!!");
-        resp.set_header("Content-Type", "text/plain");
-        resp.set_header("Connection", "close");
+        std::cout << "req id: " << serv.get_req_id() << std::endl;
 
-        std::string response = resp.to_string();
-
-        ssize_t bytes_written = write(client_socket, response.c_str(), response.size());
-        if (bytes_written < 0) {
-            Log("Failed to write to the client socket");
-            std::cerr << "Failed to write to the client socket." << std::endl;
+        if (auto it = path_handler_map.find(serv.get_req_id());
+            it != path_handler_map.end()) {
+            Handler &handler = it->second;
+            write_resp(handler.handle(serv), client_socket);
+        } else {
+            Log("No handler found for: " + serv.get_req_id());
+            std::cerr << "No handler found for: " << serv.get_req_id() << std::endl;
+            write_resp(std::move(ErrorPageHandler::handle()), client_socket);
         }
-
-        close(client_socket);
     }
 
     return true;
+}
+
+void Server::write_resp(const HttpResponse &&resp, int client_socket) {
+    std::string response = resp.to_string();
+
+    ssize_t bytes_written = write(client_socket, response.c_str(), response.size());
+    if (bytes_written < 0) {
+        Log("Failed to write to the client socket");
+        std::cerr << "Failed to write to the client socket." << std::endl;
+    }
+
+    close(client_socket);
 }
