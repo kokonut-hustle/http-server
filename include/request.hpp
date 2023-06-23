@@ -27,7 +27,6 @@ public:
     void parse() {
         get_request_method();
         get_request_path();
-        set_req_id();
         get_request_queries();
         get_request_headers();
         get_request_body();
@@ -46,8 +45,6 @@ public:
 
     const RequestMethod &get_method() const;
     const std::string &get_path() const;
-    void set_req_id();
-    const std::string &get_req_id() const;
 
 private:
     std::string get_request_method();
@@ -57,7 +54,6 @@ private:
     std::string get_request_body();
 
     const std::string request;
-    std::string req_id;
     RequestMethod method;
     std::string path;
     std::unordered_map<std::string, std::string> headers;

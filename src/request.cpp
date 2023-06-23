@@ -8,14 +8,6 @@ const RequestMethod &HttpRequest::get_method() const {
     return method;
 }
 
-void HttpRequest::set_req_id() {
-    req_id = std::string(METHOD_STR[method]) + " " + path;
-}
-
-const std::string &HttpRequest::get_req_id() const {
-    return req_id;
-}
-
 std::string HttpRequest::get_request_method() {
     std::string method_str;
 
