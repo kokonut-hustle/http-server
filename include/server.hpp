@@ -4,13 +4,14 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/epoll.h>
+#include <thread>
 
 #include "config.hpp"
 #include "request.hpp"
 #include "response.hpp"
 #include "handler.hpp"
 #include "param_handler.hpp"
-#include "thread_pool.hpp"
 
 const Config::Settings<int> int_settings = {
     // setting,  default value
@@ -18,8 +19,8 @@ const Config::Settings<int> int_settings = {
 };
 const Config::Settings<std::string> string_settings = {{"setting1", "val1"}};
 constexpr int MAX_BUFFER_SIZE = 4096;
-constexpr int TIMEOUT_SECONDS = 5;
 constexpr int MAX_THREADS = 16;
+constexpr int MAX_EVENTS = 10;
 
 struct PairHash {
     template <typename T1, typename T2>
@@ -45,14 +46,19 @@ private:
     ParamHandlerMap::iterator search_param_req(const RequestMethod &,
         const std::string &,
         std::unordered_map<std::string, std::string> &);
+
+    void worker_thread();
     void handle_client_connection(int);
-    bool process_connection(int);
     void write_resp(const HttpResponse &&, int);
 
-    ThreadPool thread_pool;
     Config::Configuration config;
     int server_socket;
     sockaddr_in server_address;
     PathHandlerMap path_handler_map;
     ParamHandlerMap param_handler_map;
+    int epollfd;
+    std::mutex mtx;
+    std::condition_variable cv;
+    std::vector<std::thread> threads;
+    std::queue<int> client_queue;
 };

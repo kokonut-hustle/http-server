@@ -39,17 +39,6 @@ public:
         }
     }
 
-    void show_request() {
-        std::cout << "method " << method << std::endl;
-        std::cout << "path " << path << std::endl;
-        for (auto t : queries)
-            std::cout << t.first << " " << t.second << std::endl;
-        std::cout << "headers " << std::endl;
-        for (auto t : headers)
-            std::cout << t.first << " " << t.second << std::endl;
-        std::cout << "body " << body << std::endl;
-    }
-
     const RequestMethod &get_method() const;
     const std::string &get_path() const;
     const std::unordered_map<std::string, std::string> &get_headers() const;
