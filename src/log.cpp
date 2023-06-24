@@ -1,3 +1,6 @@
+#include <chrono>
+#include <iomanip>
+
 #include "log.hpp"
 
 Logger::Logger() : stop_flag(false), is_logging(false) {}
@@ -11,10 +14,19 @@ Logger& Logger::get_instance() {
     return instance;
 }
 
-void Logger::log_to_file(const std::string &message) {
+void Logger::log(const std::string &message) {
     {
         std::lock_guard<std::mutex> lock(queue_mutex);
-        log_queue.push(message);
+        // Get the current time
+        auto current_time = std::chrono::system_clock::now();
+        // Convert the current time to a time_t object
+        std::time_t time = std::chrono::system_clock::to_time_t(current_time);
+        // Convert the time point to a time string
+        std::ostringstream oss;
+        oss << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S ");
+        std::string time_string = oss.str();
+
+        log_queue.push(time_string + message);
     }
     cond_var.notify_one(); // Notify waiting thread
 
@@ -22,6 +34,18 @@ void Logger::log_to_file(const std::string &message) {
     if (!is_logging) {
         start_logging_thread();
     }
+}
+
+void Logger::log_info(const std::string &message) {
+    log("Info: " + message);
+}
+
+void Logger::log_error(const std::string &message) {
+    log("Error: " + message);
+}
+
+void Logger::log_warn(const std::string &message) {
+    log("Warn: " + message);
 }
 
 void Logger::stop_logging() {

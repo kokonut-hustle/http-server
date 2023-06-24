@@ -14,7 +14,7 @@ namespace Config {
     bool read(const std::string &filename, std::map<std::string, std::string> &config_map) {
         std::ifstream file(filename);
         if (!file.is_open()) {
-            Log("Failed to open configuration file: " + filename);
+            LogErr("Failed to open configuration file: " + filename);
             std::cerr << "Failed to open configuration file: " << filename << std::endl;
             return false;
         }
@@ -53,7 +53,7 @@ namespace Config {
                     try {
                         setting.second = std::stoi(it->second);
                     } catch (std::exception &e) {
-                        Log("error when parse config " + std::string(e.what()));
+                        LogErr("error when parse config " + std::string(e.what()));
                         std::cerr << "error when parse config " << e.what() << std::endl;
                         return false;
                     }

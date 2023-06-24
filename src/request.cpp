@@ -8,6 +8,10 @@ const RequestMethod &HttpRequest::get_method() const {
     return method;
 }
 
+const std::unordered_map<std::string, std::string> &HttpRequest::get_headers() const {
+    return headers;
+}
+
 std::string HttpRequest::get_request_method() {
     std::string method_str;
 
@@ -31,6 +35,7 @@ std::string HttpRequest::get_request_method() {
             throw std::runtime_error("Invalid request method: " + method_str);
         }
     } else {
+        LogErr("Failed to get request method");
         throw std::runtime_error("Invalid request format");
     }
 
@@ -41,11 +46,13 @@ std::string HttpRequest::get_request_path() {
     // Find the start of the path (indicated by the first space character after the method)
     size_t method_end = request.find(' ');
     if (method_end == std::string::npos) {
+        LogErr("Failed to get request path, No method found");
         throw std::runtime_error("Invalid request format: no method found");
     }
 
     size_t path_start = request.find_first_not_of(' ', method_end + 1);
     if (path_start == std::string::npos) {
+        LogErr("Failed to get request path, No path found");
         throw std::runtime_error("Invalid request format: no path found");
     }
 
@@ -108,6 +115,7 @@ std::unordered_map<std::string, std::string> HttpRequest::get_request_headers() 
     // Find the position of the end of the request line
     size_t request_line_end_pos = request.find("\r\n");
     if (request_line_end_pos == std::string::npos) {
+        LogErr("Failed to get request headers, No request line found");
         throw std::runtime_error("Invalid request format: no request line found");
     }
 
@@ -117,6 +125,7 @@ std::unordered_map<std::string, std::string> HttpRequest::get_request_headers() 
     // Find the end of the headers section (indicated by an empty line)
     size_t end_pos = request.find("\r\n\r\n", start_pos);
     if (end_pos == std::string::npos) {
+        LogErr("Failed to get request headers, No headers found");
         throw std::runtime_error("Invalid request format: no headers found");
     }
 
@@ -124,6 +133,7 @@ std::unordered_map<std::string, std::string> HttpRequest::get_request_headers() 
     while (start_pos < end_pos) {
         size_t colon_pos = request.find(":", start_pos);
         if (colon_pos == std::string::npos) {
+            LogErr("Failed to get request headers, Missing colon");
             throw std::runtime_error("Invalid header format: missing colon");
         }
 

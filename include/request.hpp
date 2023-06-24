@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "log.hpp"
 
 enum RequestMethod {
     GET,
@@ -24,12 +25,18 @@ class HttpRequest {
 public:
     HttpRequest(std::string _request) : request(_request) {}
 
-    void parse() {
-        get_request_method();
-        get_request_path();
-        get_request_queries();
-        get_request_headers();
-        get_request_body();
+    bool parse() {
+        try {
+            get_request_method();
+            get_request_path();
+            get_request_queries();
+            get_request_headers();
+            get_request_body();
+            return true;
+        } catch (const std::exception &e) {
+            LogErr("Failed to parse request: " + path);
+            return false;
+        }
     }
 
     void show_request() {
@@ -45,6 +52,7 @@ public:
 
     const RequestMethod &get_method() const;
     const std::string &get_path() const;
+    const std::unordered_map<std::string, std::string> &get_headers() const;
 
 private:
     std::string get_request_method();

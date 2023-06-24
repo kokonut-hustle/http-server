@@ -6,17 +6,23 @@
 #include <condition_variable>
 #include <thread>
 
-#define Log(x) Logger::get_instance().log_to_file(x)
+#define Log(x) Logger::get_instance().log(x)
+#define LogInfo(x) Logger::get_instance().log_info(x)
+#define LogErr(x) Logger::get_instance().log_error(x)
+#define LogWarn(x) Logger::get_instance().log_warn(x)
 
 class Logger {
 public:
     static Logger& get_instance();
-    void log_to_file(const std::string &message);
-    void stop_logging();
+    void log(const std::string &message);
+    void log_info(const std::string &message);
+    void log_error(const std::string &message);
+    void log_warn(const std::string &message);
 
 private:
     Logger();
     ~Logger();
+    void stop_logging();
     void start_logging_thread();
     void write_to_file(const std::string &message);
 
