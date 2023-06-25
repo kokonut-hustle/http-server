@@ -7,11 +7,11 @@
 #include <sys/epoll.h>
 #include <thread>
 
-#include "config.hpp"
-#include "request.hpp"
-#include "response.hpp"
-#include "handler.hpp"
-#include "param_handler.hpp"
+#include "utils/config.hpp"
+#include "utils/request.hpp"
+#include "utils/response.hpp"
+#include "handler/handler.hpp"
+#include "param_handler/param_handler.hpp"
 
 const Config::Settings<int> int_settings = {
     // setting,  default value

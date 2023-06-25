@@ -1,8 +1,8 @@
 #include "server.hpp"
-#include "request.hpp"
-#include "response.hpp"
-#include "error_page_handler.hpp"
-#include "log.hpp"
+#include "utils/request.hpp"
+#include "utils/response.hpp"
+#include "handler/error_page_handler.hpp"
+#include "utils/log.hpp"
 
 Server::Server(PathHandlerMap &&_path_handler_map, ParamHandlerMap &&_param_handler_map)
     : path_handler_map(_path_handler_map),
@@ -33,7 +33,7 @@ bool Server::init() {
     if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) == -1) {
         // std::cerr << "Failed to set socket options" << std::endl;
         close(server_socket);
-        return 1;
+        return false;
     }
 
     server_address.sin_family = AF_INET;
@@ -45,14 +45,14 @@ bool Server::init() {
 bool Server::start() {
     if (bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
         LogErr("Failed to bind the socket to the specified address.");
-        // std::cerr << "Failed to bind the socket to the specified address." << std::endl;
+        std::cerr << "Failed to bind the socket to the specified address." << std::endl;
         close(server_socket);
         return false;
     }
 
     if (listen(server_socket, 10) < 0) {
         LogErr("Failed to listen on the socket.");
-        // std::cerr << "Failed to listen on the socket." << std::endl;
+        std::cerr << "Failed to listen on the socket." << std::endl;
         close(server_socket);
         return false;
     }

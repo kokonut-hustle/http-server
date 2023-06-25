@@ -1,4 +1,4 @@
-#include "response.hpp"
+#include "utils/response.hpp"
 
 void HttpResponse::set_header(const std::string& name, const std::string& value) {
     headers_[name] = value;
@@ -12,7 +12,7 @@ std::string HttpResponse::to_string() const {
     std::string response;
 
     // Append the status line
-    response += "HTTP/1.1 " + std::to_string(statusCode_) + " " + GetStatusMessage(statusCode_) + "\r\n";
+    response += "HTTP/1.1 " + std::to_string(statusCode_) + " " + get_status_message(statusCode_) + "\r\n";
 
     // Append the headers
     for (const auto& header : headers_) {
@@ -31,6 +31,6 @@ std::string HttpResponse::to_string() const {
     return response;
 }
 
-std::string HttpResponse::GetStatusMessage(int statusCode) const {
+std::string HttpResponse::get_status_message(int statusCode) const {
     return status.at(statusCode);
 }

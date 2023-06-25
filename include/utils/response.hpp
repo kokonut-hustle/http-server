@@ -28,5 +28,5 @@ private:
     std::map<std::string, std::string> headers_;
     std::string body_;
 
-    std::string GetStatusMessage(int statusCode) const;
+    std::string get_status_message(int statusCode) const;
 };

@@ -23,7 +23,7 @@ constexpr std::array<const char*, 4> METHOD_STR = {
 
 class HttpRequest {
 public:
-    HttpRequest(std::string _request) : request(_request) {}
+    HttpRequest(const std::string &_request) : request(_request) {}
 
     bool parse() {
         try {

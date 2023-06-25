@@ -4,5 +4,5 @@
 
 class MainHandler : public Handler {
 public:
-    HttpResponse handle(HttpRequest) override;
+    HttpResponse handle(const HttpRequest &) override;
 };

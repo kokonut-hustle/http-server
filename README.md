@@ -6,7 +6,7 @@ make
 ./http_srv
 ```
 ## Using
-This server serves 2 basic url:
+Be sure the port is free. This server serves 2 basic url:
 
 "http://0.0.0.0:8080/"
 

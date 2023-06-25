@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "server.hpp"
-#include "main_handler.hpp"
-#include "main_param_handler.hpp"
+#include "handler/main_handler.hpp"
+#include "param_handler/main_param_handler.hpp"
 
 int main() {
     MainHandler handler;

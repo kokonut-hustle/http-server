@@ -1,7 +1,7 @@
 #include <chrono>
 #include <iomanip>
 
-#include "log.hpp"
+#include "utils/log.hpp"
 
 Logger::Logger() : stop_flag(false), is_logging(false) {}
 

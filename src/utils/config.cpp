@@ -2,8 +2,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "config.hpp"
-#include "log.hpp"
+#include "utils/config.hpp"
+#include "utils/log.hpp"
 
 namespace Config {
     Settings<int> int_settings = {{"setting1", 1}};
