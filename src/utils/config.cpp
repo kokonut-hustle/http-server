@@ -5,7 +5,7 @@
 #include "utils/config.hpp"
 #include "utils/log.hpp"
 
-const std::string filename = "static/config.txt";
+const std::string filename = "static/server/config.txt";
 
 bool read(const std::string &filename, std::map<std::string, std::string> &read_config_map) {
     std::ifstream file(filename);

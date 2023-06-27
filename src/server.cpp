@@ -24,14 +24,14 @@ Server::~Server() {
 bool Server::init() {
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == -1) {
-        LogErr("Failed to create socket.");
-        // std::cerr << "Failed to create socket." << std::endl;
+        LogErr("Failed to create server socket.");
+        std::cerr << "Failed to create server socket." << std::endl;
         return false;
     }
 
     int enable = 1;
     if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) == -1) {
-        // std::cerr << "Failed to set socket options" << std::endl;
+        std::cerr << "Failed to set server socket options" << std::endl;
         close(server_socket);
         return false;
     }
@@ -46,14 +46,12 @@ bool Server::start() {
     if (bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
         LogErr("Failed to bind the socket to the specified address.");
         std::cerr << "Failed to bind the socket to the specified address." << std::endl;
-        close(server_socket);
         return false;
     }
 
     if (listen(server_socket, 10) < 0) {
         LogErr("Failed to listen on the socket.");
         std::cerr << "Failed to listen on the socket." << std::endl;
-        close(server_socket);
         return false;
     }
 
@@ -67,11 +65,10 @@ bool Server::start() {
         threads.push_back(std::move(thread));
     }
 
-    int epollfd = epoll_create1(0);
+    epollfd = epoll_create1(0);
     if (epollfd == -1) {
         LogErr("Failed to create epoll instance");
-        // std::cerr << "Failed to create epoll instance" << std::endl;
-        close(server_socket);
+        std::cerr << "Failed to create epoll instance" << std::endl;
         return false;
     }
 
@@ -81,9 +78,7 @@ bool Server::start() {
 
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, server_socket, &event) == -1) {
         LogErr("Failed to add server socket to epoll");
-        // std::cerr << "Failed to add server socket to epoll" << std::endl;
-        close(server_socket);
-        close(epollfd);
+        std::cerr << "Failed to add server socket to epoll" << std::endl;
         return false;
     }
 
@@ -95,7 +90,7 @@ bool Server::start() {
             if (errno == EINTR) {
                 continue;
             }
-            // std::cerr << "Error in epoll_wait" << std::endl;
+            std::cerr << "Error in epoll_wait" << std::endl;
             break;
         }
 
