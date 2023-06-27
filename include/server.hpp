@@ -13,11 +13,11 @@
 #include "handler/handler.hpp"
 #include "param_handler/param_handler.hpp"
 
-const Config::Settings<int> int_settings = {
+const Settings<int> int_settings = {
     // setting,  default value
     {"port", 8080}
 };
-const Config::Settings<std::string> string_settings = {{"setting1", "val1"}};
+const Settings<std::string> string_settings = {{}};
 constexpr int MAX_BUFFER_SIZE = 4096;
 constexpr int MAX_THREADS = 16;
 constexpr int MAX_EVENTS = 10;
@@ -51,7 +51,7 @@ private:
     void handle_client_connection(int);
     void write_resp(const HttpResponse &&, int);
 
-    Config::Configuration config;
+    Config config;
     int server_socket;
     sockaddr_in server_address;
     PathHandlerMap path_handler_map;

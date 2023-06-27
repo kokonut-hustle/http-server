@@ -2,14 +2,15 @@
 #include <map>
 #include <string>
 
-namespace Config {
-    template<typename T>
-    using Settings = std::map<std::string, T>;
+template<typename T>
+using Settings = std::map<std::string, T>;
 
-    struct Configuration {
+class Config {
+public:
+    struct ConfigStruct {
         Settings<int> int_settings;
         Settings<std::string> string_settings;
-    };
+    } conf_s;
 
     bool load_configuration();
-}
+};

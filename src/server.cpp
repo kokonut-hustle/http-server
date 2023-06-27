@@ -7,9 +7,9 @@
 Server::Server(PathHandlerMap &&_path_handler_map, ParamHandlerMap &&_param_handler_map)
     : path_handler_map(_path_handler_map),
      param_handler_map(_param_handler_map) {
-    config.int_settings = std::move(int_settings);
-    config.string_settings = std::move(string_settings);
-    Config::load_configuration();
+    config.conf_s.int_settings = std::move(int_settings);
+    config.conf_s.string_settings = std::move(string_settings);
+    config.load_configuration();
 }
 
 Server::~Server() {
@@ -38,7 +38,7 @@ bool Server::init() {
 
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_address.sin_port = htons(config.int_settings["port"]);
+    server_address.sin_port = htons(config.conf_s.int_settings["port"]);
     return true;
 }
 
@@ -57,8 +57,8 @@ bool Server::start() {
         return false;
     }
 
-    LogInfo("Server started on port " + std::to_string(config.int_settings["port"]));
-    std::cout << "Server started on port " << config.int_settings["port"] << std::endl;
+    LogInfo("Server started on port " + std::to_string(config.conf_s.int_settings["port"]));
+    std::cout << "Server started on port " << config.conf_s.int_settings["port"] << std::endl;
 
     for (int i = 0; i < MAX_THREADS; ++i) {
         std::thread thread([this]() {
