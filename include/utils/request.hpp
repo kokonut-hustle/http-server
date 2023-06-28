@@ -5,21 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "constants.hpp"
 #include "log.hpp"
-
-enum RequestMethod {
-    GET,
-    POST,
-    PUT,
-    DELETE
-};
-
-constexpr std::array<const char*, 4> METHOD_STR = {
-    "GET",
-    "POST",
-    "PUT",
-    "DELETE"
-};
 
 class HttpRequest {
 public:

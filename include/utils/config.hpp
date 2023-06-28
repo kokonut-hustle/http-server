@@ -2,8 +2,7 @@
 #include <map>
 #include <string>
 
-template<typename T>
-using Settings = std::map<std::string, T>;
+#include "constants.hpp"
 
 class Config {
 public:

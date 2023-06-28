@@ -7,20 +7,12 @@
 #include <sys/epoll.h>
 #include <thread>
 
+#include "utils/constants.hpp"
 #include "utils/config.hpp"
 #include "utils/request.hpp"
 #include "utils/response.hpp"
 #include "handler/handler.hpp"
 #include "param_handler/param_handler.hpp"
-
-const Settings<int> int_settings = {
-    // setting,  default value
-    {"port", 8080}
-};
-const Settings<std::string> string_settings = {{}};
-constexpr int MAX_BUFFER_SIZE = 4096;
-constexpr int MAX_THREADS = 16;
-constexpr int MAX_EVENTS = 10;
 
 struct PairHash {
     template <typename T1, typename T2>

@@ -58,7 +58,7 @@ bool Server::start() {
     LogInfo("Server started on port " + std::to_string(config.conf_s.int_settings["port"]));
     std::cout << "Server started on port " << config.conf_s.int_settings["port"] << std::endl;
 
-    for (int i = 0; i < MAX_THREADS; ++i) {
+    for (int i = 0; i < config.conf_s.int_settings["max_threads"]; ++i) {
         std::thread thread([this]() {
             this->worker_thread();
         });
@@ -82,10 +82,10 @@ bool Server::start() {
         return false;
     }
 
-    std::vector<struct epoll_event> events(MAX_EVENTS);
+    std::vector<struct epoll_event> events(config.conf_s.int_settings["max_events"]);
 
     while (true) {
-        int num_events = epoll_wait(epollfd, events.data(), MAX_EVENTS, -1);
+        int num_events = epoll_wait(epollfd, events.data(), config.conf_s.int_settings["max_events"], -1);
         if (num_events == -1) {
             if (errno == EINTR) {
                 continue;
@@ -153,13 +153,6 @@ void Server::handle_client_connection(int client_socket) {
     ssize_t bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
 
     if (bytes_read <= 0) {
-        if (bytes_read == 0) {
-            LogInfo("Client disconnected");
-            // std::cout << "Client disconnected" << std::endl;
-        } else { // Maybe client socket is timeout
-            LogInfo("Cannot receiving data from client: " + std::to_string(errno));
-            // std::cerr << "Cannot receiving data from client: " << errno << std::endl;
-        }
         close(client_socket);
         return;
     }
